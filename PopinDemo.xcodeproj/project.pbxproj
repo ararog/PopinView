@@ -18,9 +18,12 @@
 		489C0622170F9393001E9DC3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 489C0621170F9393001E9DC3 /* Default-568h@2x.png */; };
 		489C0625170F9393001E9DC3 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 489C0624170F9393001E9DC3 /* ViewController.m */; };
 		489C0628170F9393001E9DC3 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 489C0626170F9393001E9DC3 /* ViewController.xib */; };
-		489C062F170F9525001E9DC3 /* apple.png in Resources */ = {isa = PBXBuildFile; fileRef = 489C062E170F9525001E9DC3 /* apple.png */; };
 		489C0632170F955C001E9DC3 /* PopinView.m in Sources */ = {isa = PBXBuildFile; fileRef = 489C0631170F955C001E9DC3 /* PopinView.m */; };
 		489C0634170F9961001E9DC3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 489C0633170F9961001E9DC3 /* QuartzCore.framework */; };
+		48CA3E51171056DD0043692D /* android.png in Resources */ = {isa = PBXBuildFile; fileRef = 48CA3E4D171056DD0043692D /* android.png */; };
+		48CA3E52171056DD0043692D /* apple.png in Resources */ = {isa = PBXBuildFile; fileRef = 48CA3E4E171056DD0043692D /* apple.png */; };
+		48CA3E53171056DD0043692D /* google.png in Resources */ = {isa = PBXBuildFile; fileRef = 48CA3E4F171056DD0043692D /* google.png */; };
+		48CA3E54171056DD0043692D /* skype.png in Resources */ = {isa = PBXBuildFile; fileRef = 48CA3E50171056DD0043692D /* skype.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,10 +43,13 @@
 		489C0623170F9393001E9DC3 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		489C0624170F9393001E9DC3 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		489C0627170F9393001E9DC3 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
-		489C062E170F9525001E9DC3 /* apple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = apple.png; sourceTree = "<group>"; };
 		489C0630170F955C001E9DC3 /* PopinView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopinView.h; sourceTree = "<group>"; };
 		489C0631170F955C001E9DC3 /* PopinView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PopinView.m; sourceTree = "<group>"; };
 		489C0633170F9961001E9DC3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		48CA3E4D171056DD0043692D /* android.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = android.png; sourceTree = "<group>"; };
+		48CA3E4E171056DD0043692D /* apple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = apple.png; sourceTree = "<group>"; };
+		48CA3E4F171056DD0043692D /* google.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = google.png; sourceTree = "<group>"; };
+		48CA3E50171056DD0043692D /* skype.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = skype.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,7 +98,6 @@
 		489C0611170F9393001E9DC3 /* PopinDemo */ = {
 			isa = PBXGroup;
 			children = (
-				489C062E170F9525001E9DC3 /* apple.png */,
 				489C0630170F955C001E9DC3 /* PopinView.h */,
 				489C0631170F955C001E9DC3 /* PopinView.m */,
 				489C061A170F9393001E9DC3 /* AppDelegate.h */,
@@ -100,6 +105,7 @@
 				489C0623170F9393001E9DC3 /* ViewController.h */,
 				489C0624170F9393001E9DC3 /* ViewController.m */,
 				489C0626170F9393001E9DC3 /* ViewController.xib */,
+				48CA3E4C171056DD0043692D /* images */,
 				489C0612170F9393001E9DC3 /* Supporting Files */,
 			);
 			path = PopinDemo;
@@ -117,6 +123,17 @@
 				489C0621170F9393001E9DC3 /* Default-568h@2x.png */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		48CA3E4C171056DD0043692D /* images */ = {
+			isa = PBXGroup;
+			children = (
+				48CA3E4D171056DD0043692D /* android.png */,
+				48CA3E4E171056DD0043692D /* apple.png */,
+				48CA3E4F171056DD0043692D /* google.png */,
+				48CA3E50171056DD0043692D /* skype.png */,
+			);
+			path = images;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -175,7 +192,10 @@
 				489C0620170F9393001E9DC3 /* Default@2x.png in Resources */,
 				489C0622170F9393001E9DC3 /* Default-568h@2x.png in Resources */,
 				489C0628170F9393001E9DC3 /* ViewController.xib in Resources */,
-				489C062F170F9525001E9DC3 /* apple.png in Resources */,
+				48CA3E51171056DD0043692D /* android.png in Resources */,
+				48CA3E52171056DD0043692D /* apple.png in Resources */,
+				48CA3E53171056DD0043692D /* google.png in Resources */,
+				48CA3E54171056DD0043692D /* skype.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,6 +332,7 @@
 				489C062D170F9393001E9DC3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

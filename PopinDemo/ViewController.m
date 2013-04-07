@@ -18,7 +18,10 @@
 {
     [super viewDidLoad];
 	
-    popinView.images = @[[UIImage imageNamed:@"apple.png"]];
+    popinView.images = @[[UIImage imageNamed:@"apple.png"],
+                         [UIImage imageNamed:@"android.png"],
+                         [UIImage imageNamed:@"google.png"],
+                         [UIImage imageNamed:@"skype.png"]];
 }
 
 @end

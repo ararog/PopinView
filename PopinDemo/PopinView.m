@@ -11,7 +11,8 @@
 
 @interface PopinView () {
     
-    BOOL imageOnCenter;
+    NSInteger stopAt, current, previous;
+    BOOL first, last;
 }
 
 - (CAAnimationGroup *) createAnimation:(UIView *)viewToAnimate
@@ -35,7 +36,9 @@
         gestureRecognizer.direction = UISwipeGestureRecognizerDirectionDown;
         [self addGestureRecognizer:gestureRecognizer];
         
-        imageOnCenter = NO;
+        first = YES;
+        last = NO;
+        current = 0;
     }
     return self;
 }
@@ -47,76 +50,106 @@
         
         self.clipsToBounds = YES;
         
-        UISwipeGestureRecognizer* gestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self
-                                                                                                action:@selector(swipe:)];
+        UISwipeGestureRecognizer* gestureRecognizer;
+        
+        gestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self
+                                                                      action:@selector(swipe:)];
         gestureRecognizer.direction = UISwipeGestureRecognizerDirectionDown;
+
+        [self addGestureRecognizer:gestureRecognizer];
+
+        gestureRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self
+                                                                      action:@selector(swipe:)];
+        gestureRecognizer.direction = UISwipeGestureRecognizerDirectionUp;
+        
         [self addGestureRecognizer:gestureRecognizer];
         
-        imageOnCenter = NO;
+        first = YES;
+        last = NO;
+        current = 0;
     }
     return self;
 }
 
 - (void) swipe:(UISwipeGestureRecognizer *)recognizer {
     
+    UIImageView *currentImageView, *existingImageView, *previousImageView;
     CGPoint startPoint, endPoint;
-    
-    UIImageView* oldView = (UIImageView *)[self viewWithTag:1000];
-    if(oldView != nil)
-        [oldView removeFromSuperview];
     
     if(recognizer.direction == UISwipeGestureRecognizerDirectionDown) {
 
-        UIImage *image = (UIImage *)[_images objectAtIndex:0];
-
-        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 64, 64)];
-        imageView.tag = 1000;
-        imageView.image = image;
-        imageView.clipsToBounds = YES;
+        UIImage *image = [_images objectAtIndex:current];
         
-        [self addSubview:imageView];
-        //[self.layer addSublayer:imageView.layer];
+        existingImageView = (UIImageView *) [self viewWithTag:(current + 1000)];
+        if(existingImageView)
+            currentImageView = existingImageView;
         
-        if(! imageOnCenter) {
-            endPoint = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
-            startPoint = endPoint;
-            startPoint.y = startPoint.y - 20;
-            
-            imageView.center = startPoint;
+        currentImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 64, 64)];
+        currentImageView.tag = current + 1000;
+        currentImageView.image = image;
 
-            imageView.bounds = CGRectMake(0, 0, 0, 0);
-
-            [UIView animateWithDuration:0.5 animations:^{
-                CAAnimationGroup* group = [self createAnimation:imageView
-                                                 withStartPoint:startPoint
-                                                       endPoint:endPoint
-                                                        endSize:CGSizeMake(64, 64)];
-                
-                [imageView.layer addAnimation:group forKey:@"curveAnimation"];
-            } completion:^(BOOL finished) {
-                imageOnCenter = YES;
-            }];
+        if (first) {
+            [self addSubview:currentImageView];
         }
-        else {
+        else
+            [self insertSubview:currentImageView
+                   belowSubview:[self viewWithTag:(previous + 1000)]];
+        
+        endPoint = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
+        startPoint = endPoint;
+        startPoint.y = startPoint.y - 20;
+        
+        currentImageView.center = startPoint;
+
+        currentImageView.bounds = CGRectMake(0, 0, 0, 0);
+
+        [UIView animateWithDuration:0.5 animations:^{
+            
+            CAAnimationGroup* group = [self createAnimation:currentImageView
+                                             withStartPoint:startPoint
+                                                   endPoint:endPoint
+                                                    endSize:CGSizeMake(64, 64)];
+            
+            [currentImageView.layer addAnimation:group forKey:@"curveAnimation"];
+            
+        } completion:^(BOOL finished) {
+            if(first) {
+                previous = current;
+                current++;
+                first = NO;
+            }
+        }];
+
+        if(! first) {
+            
+            previousImageView = (UIImageView *) [self viewWithTag:(previous + 1000)];
             
             endPoint = CGPointMake(self.frame.size.width / 2, self.frame.size.height + (64 * 2));
             startPoint = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
             
-            imageView.center = startPoint;
+            previousImageView.center = startPoint;
             
-            imageView.bounds = CGRectMake(0, 0, 64, 64);
+            previousImageView.bounds = CGRectMake(0, 0, 64, 64);
             
-            imageView.contentMode = UIViewContentModeScaleToFill;
+            previousImageView.contentMode = UIViewContentModeScaleToFill;
             
             [UIView animateWithDuration:0.5 animations:^{
-                CAAnimationGroup* group = [self createAnimation:imageView
+                
+                CAAnimationGroup* group = [self createAnimation:previousImageView
                                                  withStartPoint:startPoint
                                                        endPoint:endPoint
                                                         endSize:CGSizeMake(64 * 3, 64 * 3)];
                 
-                [imageView.layer addAnimation:group forKey:@"curveAnimation"];
+                [previousImageView.layer addAnimation:group forKey:@"curveAnimation"];
+                
             } completion:^(BOOL finished) {
-                imageOnCenter = NO;
+
+                previous = current;
+                current++;
+                if (current >= [_images count]) {
+                    previous = current - 1;
+                    current = 0;
+                }
             }];
         }
     }
