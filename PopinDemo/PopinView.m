@@ -11,14 +11,16 @@
 
 @interface PopinView () {
     
-    NSInteger stopAt, current, previous;
-    BOOL first, last;
+    NSInteger stopAt, current, next, previous;
+    BOOL first;
+    NSUInteger currentDirection;
 }
 
 - (CAAnimationGroup *) createAnimation:(UIView *)viewToAnimate
                         withStartPoint:(CGPoint)startPoint
                               endPoint:(CGPoint)endPoint
-                               endSize:(CGSize)endSize;
+                               endSize:(CGSize)endSize
+                               reverse:(BOOL)reverse;
 
 @end
 
@@ -37,8 +39,8 @@
         [self addGestureRecognizer:gestureRecognizer];
         
         first = YES;
-        last = NO;
-        current = 0;
+        currentDirection = -1;
+        next = previous = -1;
     }
     return self;
 }
@@ -65,8 +67,8 @@
         [self addGestureRecognizer:gestureRecognizer];
         
         first = YES;
-        last = NO;
-        current = 0;
+        currentDirection = -1;
+        next = previous = -1;
     }
     return self;
 }
@@ -77,7 +79,17 @@
     CGPoint startPoint, endPoint;
     
     if(recognizer.direction == UISwipeGestureRecognizerDirectionDown) {
-
+        if(first)
+            current = 0;
+        
+        if (currentDirection != recognizer.direction) {
+            currentDirection = recognizer.direction;
+            if (next != -1) {
+                previous = next;
+                current = next + 1;
+            }
+        }
+        
         UIImage *image = [_images objectAtIndex:current];
         
         existingImageView = (UIImageView *) [self viewWithTag:(current + 1000)];
@@ -108,7 +120,8 @@
             CAAnimationGroup* group = [self createAnimation:currentImageView
                                              withStartPoint:startPoint
                                                    endPoint:endPoint
-                                                    endSize:CGSizeMake(64, 64)];
+                                                    endSize:CGSizeMake(64, 64)
+                                                    reverse:NO];
             
             [currentImageView.layer addAnimation:group forKey:@"curveAnimation"];
             
@@ -138,7 +151,8 @@
                 CAAnimationGroup* group = [self createAnimation:previousImageView
                                                  withStartPoint:startPoint
                                                        endPoint:endPoint
-                                                        endSize:CGSizeMake(64 * 3, 64 * 3)];
+                                                        endSize:CGSizeMake(64 * 3, 64 * 3)
+                                                        reverse:NO];
                 
                 [previousImageView.layer addAnimation:group forKey:@"curveAnimation"];
                 
@@ -153,12 +167,101 @@
             }];
         }
     }
+    else {
+        if (first)
+            current = [_images count] - 1;
+        
+        if (currentDirection != recognizer.direction) {
+            currentDirection = recognizer.direction;
+            if(previous != -1) {
+                next = previous;
+                current = previous - 1;
+            }
+        }
+        
+        UIImage *image = [_images objectAtIndex:current];
+        
+        existingImageView = (UIImageView *) [self viewWithTag:(current + 1000)];
+        if(existingImageView)
+            currentImageView = existingImageView;
+        
+        currentImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 64, 64)];
+        currentImageView.tag = current + 1000;
+        currentImageView.image = image;
+        
+        if (first) {
+            [self addSubview:currentImageView];
+        }
+        else
+            [self insertSubview:currentImageView
+                   aboveSubview:[self viewWithTag:(next + 1000)]];
+        
+        endPoint = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
+        startPoint = CGPointMake(self.frame.size.width / 2, self.frame.size.height + (64 * 2));
+        
+        currentImageView.center = startPoint;
+        
+        currentImageView.bounds = CGRectMake(0, 0, 64 * 3, 64 * 3);
+        
+        currentImageView.contentMode = UIViewContentModeScaleToFill;
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            
+            CAAnimationGroup* group = [self createAnimation:currentImageView
+                                             withStartPoint:startPoint
+                                                   endPoint:endPoint
+                                                    endSize:CGSizeMake(64, 64)
+                                                    reverse:YES];
+            
+            [currentImageView.layer addAnimation:group forKey:@"curveAnimation"];
+            
+        } completion:^(BOOL finished) {
+            if(first) {
+                next = current;
+                current--;
+                first = NO;
+            }
+        }];
+        
+        if(! first) {
+            previousImageView = (UIImageView *) [self viewWithTag:(next + 1000)];
+            
+            startPoint = CGPointMake(self.frame.size.width / 2, self.frame.size.height / 2);
+            endPoint = startPoint;
+            endPoint.y = endPoint.y - 20;
+            
+            previousImageView.center = startPoint;
+            
+            previousImageView.bounds = CGRectMake(0, 0, 64, 64);
+            
+            [UIView animateWithDuration:0.5 animations:^{
+                
+                CAAnimationGroup* group = [self createAnimation:previousImageView
+                                                 withStartPoint:startPoint
+                                                       endPoint:endPoint
+                                                        endSize:CGSizeMake(0, 0)
+                                                        reverse:YES];
+                
+                [previousImageView.layer addAnimation:group forKey:@"curveAnimation"];
+                
+            } completion:^(BOOL finished) {
+                
+                next = current;
+                current--;
+                if (current <= -1) {
+                    next = current + 1;
+                    current = [_images count] - 1;
+                }
+            }];
+        }
+    }
 }
 
 -(CAAnimationGroup *)createAnimation:(UIView *)viewToAnimate
                       withStartPoint:(CGPoint)startPoint
                             endPoint:(CGPoint)endPoint
-                             endSize:(CGSize)endSize {
+                             endSize:(CGSize)endSize
+                             reverse:(BOOL)reverse {
     
     CABasicAnimation *resizeAnimation = [CABasicAnimation animationWithKeyPath:@"bounds.size"];
     [resizeAnimation setToValue:[NSValue valueWithCGSize:endSize]];
@@ -171,7 +274,11 @@
     pathAnimation.removedOnCompletion = NO;
     CGMutablePathRef curvedPath = CGPathCreateMutable();
     CGPathMoveToPoint(curvedPath, NULL, startPoint.x, startPoint.y);
-    CGPathAddCurveToPoint(curvedPath, NULL, endPoint.x, startPoint.y, endPoint.x, startPoint.y, endPoint.x, endPoint.y);
+    if (! reverse)
+        CGPathAddCurveToPoint(curvedPath, NULL, endPoint.x, startPoint.y, endPoint.x, startPoint.y, endPoint.x, endPoint.y);
+    else
+        CGPathAddCurveToPoint(curvedPath, NULL, startPoint.x, endPoint.y, startPoint.x, endPoint.y, endPoint.x, endPoint.y);
+
     pathAnimation.path = curvedPath;
     CGPathRelease(curvedPath);
     
