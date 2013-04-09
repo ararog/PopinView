@@ -20,7 +20,9 @@
                         withStartPoint:(CGPoint)startPoint
                               endPoint:(CGPoint)endPoint
                                endSize:(CGSize)endSize
-                               reverse:(BOOL)reverse;
+                               reverse:(BOOL)reverse
+                              duration:(CGFloat)duration
+                                offset:(NSInteger)offset;
 
 @end
 
@@ -115,13 +117,15 @@
 
         currentImageView.bounds = CGRectMake(0, 0, 0, 0);
 
-        [UIView animateWithDuration:0.5 animations:^{
+        [UIView animateWithDuration:0.7 animations:^{
             
             CAAnimationGroup* group = [self createAnimation:currentImageView
                                              withStartPoint:startPoint
                                                    endPoint:endPoint
                                                     endSize:CGSizeMake(64, 64)
-                                                    reverse:NO];
+                                                    reverse:NO
+                                                   duration:0.7f
+                                                     offset:15];
             
             [currentImageView.layer addAnimation:group forKey:@"curveAnimation"];
             
@@ -146,13 +150,15 @@
             
             previousImageView.contentMode = UIViewContentModeScaleToFill;
             
-            [UIView animateWithDuration:0.5 animations:^{
+            [UIView animateWithDuration:0.2 animations:^{
                 
                 CAAnimationGroup* group = [self createAnimation:previousImageView
                                                  withStartPoint:startPoint
                                                        endPoint:endPoint
                                                         endSize:CGSizeMake(64 * 3, 64 * 3)
-                                                        reverse:NO];
+                                                        reverse:NO
+                                                       duration:0.2f
+                                                         offset:0];
                 
                 [previousImageView.layer addAnimation:group forKey:@"curveAnimation"];
                 
@@ -205,13 +211,15 @@
         
         currentImageView.contentMode = UIViewContentModeScaleToFill;
         
-        [UIView animateWithDuration:0.5 animations:^{
+        [UIView animateWithDuration:0.7 animations:^{
             
             CAAnimationGroup* group = [self createAnimation:currentImageView
                                              withStartPoint:startPoint
                                                    endPoint:endPoint
                                                     endSize:CGSizeMake(64, 64)
-                                                    reverse:YES];
+                                                    reverse:YES
+                                                   duration:0.7f
+                                                     offset:15];
             
             [currentImageView.layer addAnimation:group forKey:@"curveAnimation"];
             
@@ -240,7 +248,9 @@
                                                  withStartPoint:startPoint
                                                        endPoint:endPoint
                                                         endSize:CGSizeMake(0, 0)
-                                                        reverse:YES];
+                                                        reverse:YES
+                                                       duration:0.5f
+                                                         offset:0];
                 
                 [previousImageView.layer addAnimation:group forKey:@"curveAnimation"];
                 
@@ -261,7 +271,9 @@
                       withStartPoint:(CGPoint)startPoint
                             endPoint:(CGPoint)endPoint
                              endSize:(CGSize)endSize
-                             reverse:(BOOL)reverse {
+                             reverse:(BOOL)reverse
+                            duration:(CGFloat)duration
+                              offset:(NSInteger)offset {
     
     CABasicAnimation *resizeAnimation = [CABasicAnimation animationWithKeyPath:@"bounds.size"];
     [resizeAnimation setToValue:[NSValue valueWithCGSize:endSize]];
@@ -275,9 +287,11 @@
     CGMutablePathRef curvedPath = CGPathCreateMutable();
     CGPathMoveToPoint(curvedPath, NULL, startPoint.x, startPoint.y);
     if (! reverse)
-        CGPathAddCurveToPoint(curvedPath, NULL, endPoint.x, startPoint.y, endPoint.x, startPoint.y, endPoint.x, endPoint.y);
+        CGPathAddCurveToPoint(curvedPath, NULL, endPoint.x, startPoint.y,
+                              endPoint.x, startPoint.y - offset, endPoint.x, endPoint.y);
     else
-        CGPathAddCurveToPoint(curvedPath, NULL, startPoint.x, endPoint.y, startPoint.x, endPoint.y, endPoint.x, endPoint.y);
+        CGPathAddCurveToPoint(curvedPath, NULL, startPoint.x, endPoint.y,
+                              startPoint.x, endPoint.y - offset, endPoint.x, endPoint.y);
 
     pathAnimation.path = curvedPath;
     CGPathRelease(curvedPath);
@@ -286,7 +300,7 @@
     group.fillMode = kCAFillModeForwards;
     group.removedOnCompletion = NO;
     [group setAnimations:[NSArray arrayWithObjects:pathAnimation, resizeAnimation, nil]];
-    group.duration = 0.5f;
+    group.duration = duration;
     group.delegate = self;
     [group setValue:viewToAnimate forKey:@"imageViewBeingAnimated"];
 
